@@ -10,21 +10,78 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="10dp">
+        android:padding="10dp"
+        >
         <EditText
-            android:layout_width="80dp"
-            android:layout_height="80dp"
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:layout_weight="1"
             android:maxLength="1"
             android:inputType="text"
             android:layout_margin="10dp"
-            />
+            android:layout_gravity="center"
+            android:background="@color/purple_700"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:textSize="40dp"/>
         <EditText
-            android:layout_width="80dp"
-            android:layout_height="80dp"/>
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:layout_weight="1"
+            android:maxLength="1"
+            android:inputType="text"
+            android:layout_margin="10dp"
+            android:layout_gravity="center"
+            android:background="@color/purple_700"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:textSize="40dp"/>
         <EditText
-            android:layout_width="80dp"
-            android:layout_height="80dp"/>
-
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:layout_weight="1"
+            android:maxLength="1"
+            android:inputType="text"
+            android:layout_margin="10dp"
+            android:layout_gravity="center"
+            android:background="@color/purple_700"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:textSize="40dp"/>
+        <EditText
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:layout_weight="1"
+            android:maxLength="1"
+            android:inputType="text"
+            android:layout_margin="10dp"
+            android:layout_gravity="center"
+            android:background="@color/purple_700"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:textSize="40dp"/>
+        <EditText
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:layout_weight="1"
+            android:maxLength="1"
+            android:inputType="text"
+            android:layout_margin="10dp"
+            android:layout_gravity="center"
+            android:background="@color/purple_700"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:textSize="40dp"/>
     </LinearLayout>
+    <Button
+        android:layout_gravity="center"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
+        android:text="Check"/>
 
 </LinearLayout>
