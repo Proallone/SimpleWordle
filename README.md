@@ -1,5 +1,5 @@
 # SimpleWordle
-<div>
+<h1>
 Simple wordle game written in Kotlin for android devices.
-</div>
+</h1>
 
