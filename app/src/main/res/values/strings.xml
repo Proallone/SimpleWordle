@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">SimpleWordle</string>
     <string name="check_btn">Check</string>
+    <string name="re_roll_btn">Re-roll</string>
 </resources>

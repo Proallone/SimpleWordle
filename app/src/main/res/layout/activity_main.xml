@@ -86,10 +86,18 @@
             android:textSize="40sp"/>
     </LinearLayout>
     <Button
+        android:id="@+id/check_btn"
         android:layout_gravity="center"
         android:layout_width="100dp"
         android:layout_height="50dp"
         android:backgroundTint="@color/green_btn"
         android:text="@string/check_btn"/>
+    <Button
+        android:id="@+id/re_roll_btn"
+        android:layout_gravity="center"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
+        android:backgroundTint="@color/green_btn"
+        android:text="@string/re_roll_btn"/>
 
 </LinearLayout>
