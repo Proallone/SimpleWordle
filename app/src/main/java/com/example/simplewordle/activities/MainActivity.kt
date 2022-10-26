@@ -19,28 +19,27 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         val wordsJsonFileName = "words.json"
-        val wordsJson = getJsonWordList(wordsJsonFileName)
+        val wordsList = getWordList(wordsJsonFileName)
 
-        val wordsListArray = getWordList(wordsJson.toString())
 
-        val lastWordIdx = wordsListArray.size
+        val lastWordIdx = wordsList!!.size
         val seedThisDay = getTodaySeed()
         val todayIdx = getRandomWordIndex(seedThisDay, lastWordIdx)
-        val todayWord = wordsListArray[todayIdx]
+        val todayWord = wordsList[todayIdx]
 
         Log.d("today word", todayWord)
 
         val reRollBtn = findViewById<Button>(R.id.re_roll_btn)
         reRollBtn.setOnClickListener {
             val randomWordIdx = getRandomWordIndex(getRandomSeed(todayIdx), todayIdx)
-            Log.d("random word", wordsListArray[randomWordIdx])
+            Log.d("random word", wordsList[randomWordIdx])
         }
 
         val checkBtn = findViewById<Button>(R.id.check_btn)
         checkBtn.setOnClickListener {
             var win = false
             val userInputWord = getUserInputWord()
-            val isInWordList = checkIfInWordList(userInputWord, wordsListArray)
+            val isInWordList = checkIfInWordList(userInputWord, wordsList)
             Log.d("Isinlist", isInWordList.toString())
             if (isInWordList) {
                 win = checkWordCorrectness(userInputWord, todayWord)
@@ -88,28 +87,18 @@ class MainActivity : AppCompatActivity() {
      * @param jsonFileName name of the assets file with words in json format
      * @return serialized json value
      */
-    private fun getJsonWordList(jsonFileName: String): String? {
-        var json: String? = null
+    private fun getWordList(jsonFileName: String): List<String>? {
+        val wordList: List<String>?
         try {
             val inputStream: InputStream = assets.open(jsonFileName)
-            json = inputStream.bufferedReader().use { it.readText() }
+            val jsonWords = inputStream.bufferedReader().use { it.readText()}
+            wordList = Gson().fromJson(jsonWords, WordleWord::class.java).words
 
         } catch (ex: Exception) {
             ex.printStackTrace()
             return null
         }
-        return json
-    }
-
-
-    /**
-     * @param
-     * @return
-     */
-    private fun getWordList(wordsJson: String): List<String> {
-        val gson = Gson()
-        val wordsObj = gson.fromJson(wordsJson, WordleWord::class.java)
-        return wordsObj.words
+        return wordList
     }
 
     /**
