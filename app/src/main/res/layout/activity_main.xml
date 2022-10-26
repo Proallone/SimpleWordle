@@ -11,8 +11,10 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:padding="10dp"
+        android:id="@+id/firstLineLayout"
         >
         <EditText
+            android:id="@+id/userInput00"
             android:layout_width="0dp"
             android:layout_height="60dp"
             android:layout_weight="1"
@@ -29,6 +31,7 @@
 
             />
         <EditText
+            android:id="@+id/userInput01"
             android:layout_width="0dp"
             android:layout_height="60dp"
             android:layout_weight="1"
@@ -43,6 +46,7 @@
             android:textStyle="bold"
             android:textSize="40sp"/>
         <EditText
+            android:id="@+id/userInput02"
             android:layout_width="0dp"
             android:layout_height="60dp"
             android:layout_weight="1"
@@ -57,6 +61,7 @@
             android:textStyle="bold"
             android:textSize="40sp"/>
         <EditText
+            android:id="@+id/userInput03"
             android:layout_width="0dp"
             android:layout_height="60dp"
             android:layout_weight="1"
@@ -71,6 +76,7 @@
             android:textStyle="bold"
             android:textSize="40sp"/>
         <EditText
+            android:id="@+id/userInput04"
             android:layout_width="0dp"
             android:layout_height="60dp"
             android:layout_weight="1"
