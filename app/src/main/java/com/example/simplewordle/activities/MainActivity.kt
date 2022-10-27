@@ -4,7 +4,10 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import android.widget.EditText
+import android.widget.LinearLayout
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.res.ResourcesCompat
 import com.example.simplewordle.R
 import com.example.simplewordle.classes.WordleWord
 import com.google.gson.Gson
@@ -18,34 +21,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val wordsJsonFileName = "words.json"
-        val wordsList = getWordList(wordsJsonFileName)
+        gameLoop(false)
 
-
-        val lastWordIdx = wordsList!!.size
-        val seedThisDay = getTodaySeed()
-        val todayIdx = getRandomWordIndex(seedThisDay, lastWordIdx)
-        val todayWord = wordsList[todayIdx]
-
-        Log.d("today word", todayWord)
-
-        val reRollBtn = findViewById<Button>(R.id.re_roll_btn)
-        reRollBtn.setOnClickListener {
-            val randomWordIdx = getRandomWordIndex(getRandomSeed(todayIdx), todayIdx)
-            Log.d("random word", wordsList[randomWordIdx])
-        }
-
-        val checkBtn = findViewById<Button>(R.id.check_btn)
-        checkBtn.setOnClickListener {
-            var win = false
-            val userInputWord = getUserInputWord()
-            val isInWordList = checkIfInWordList(userInputWord, wordsList)
-            Log.d("Isinlist", isInWordList.toString())
-            if (isInWordList) {
-                win = checkWordCorrectness(userInputWord, todayWord)
-            }
-            Log.d("GameOver", win.toString())
-        }
 
     }
 
@@ -91,7 +68,7 @@ class MainActivity : AppCompatActivity() {
         val wordList: List<String>?
         try {
             val inputStream: InputStream = assets.open(jsonFileName)
-            val jsonWords = inputStream.bufferedReader().use { it.readText()}
+            val jsonWords = inputStream.bufferedReader().use { it.readText() }
             wordList = Gson().fromJson(jsonWords, WordleWord::class.java).words
 
         } catch (ex: Exception) {
@@ -105,26 +82,42 @@ class MainActivity : AppCompatActivity() {
      * Function gets user input word from given row.
      * @return word provided by the user
      */
-    private fun getUserInputWord(): String {
+    private fun getUserInputWord(correctWord: String, currentRow: LinearLayout): String {
 
-        val et00 = findViewById<EditText>(R.id.userInput00)
-        val et01 = findViewById<EditText>(R.id.userInput01)
-        val et02 = findViewById<EditText>(R.id.userInput02)
-        val et03 = findViewById<EditText>(R.id.userInput03)
-        val et04 = findViewById<EditText>(R.id.userInput04)
+        var userWord = ""
 
-        val char00 = et00.text.toString().lowercase()
-        val char01 = et01.text.toString().lowercase()
-        val char02 = et02.text.toString().lowercase()
-        val char03 = et03.text.toString().lowercase()
-        val char04 = et04.text.toString().lowercase()
+        val inputRow = currentRow
+        //val childrenCount = inputRow.childCount
+        for (i in 0 until inputRow.childCount) {
+            val editText = inputRow.getChildAt(i) as EditText
+            val currentLetter = editText.text.toString().lowercase()
 
-        val userInputWord = char00 + char01 + char02 + char03 + char04
-//        val firstLine = findViewById<LinearLayout>(R.id.firstLineLayout)
-//
-//        val u00 = firstLine.getChildAt(0)
+            if (currentLetter.isNotBlank()) {
+                if (correctWord[i].toString() == currentLetter) {
+                    editText.background =
+                        ResourcesCompat.getDrawable(
+                            resources,
+                            R.drawable.letter_correct_rightplace,
+                            null
+                        )
 
-        return userInputWord
+                } else if (correctWord.contains(currentLetter)) {
+                    editText.background =
+                        ResourcesCompat.getDrawable(
+                            resources,
+                            R.drawable.letter_correct_wrongplace,
+                            null
+                        )
+
+                } else {
+                    editText.background =
+                        ResourcesCompat.getDrawable(resources, R.drawable.letter_wrong, null)
+                }
+                editText.isEnabled = false
+                userWord += currentLetter
+            }
+        }
+        return userWord
     }
 
     /**
@@ -145,5 +138,64 @@ class MainActivity : AppCompatActivity() {
      */
     private fun checkIfInWordList(userWord: String, wordList: List<String>): Boolean {
         return (userWord == wordList.find { word -> word == userWord })
+    }
+
+    private fun gameLoop(gameStatus: Boolean) {
+
+        //        var currentRow = 0
+//        var userWord: String? = null
+//        while (gameStatus) {
+////            userWord = getUserInputWord()
+//
+//
+//        }
+
+        val wordsJsonFileName = "words.json"
+        val wordsList = getWordList(wordsJsonFileName)
+        val inputLayout = findViewById<LinearLayout>(R.id.inputLayout)
+
+        val lastWordIdx = wordsList!!.size
+        val seedThisDay = getTodaySeed()
+        val todayIdx = getRandomWordIndex(seedThisDay, lastWordIdx)
+        val todayWord = wordsList[todayIdx]
+        Log.d("today word", todayWord)
+
+        var currentRow = 0
+
+
+        val checkBtn = findViewById<Button>(R.id.check_btn)
+        checkBtn.setOnClickListener {
+
+            val nowRow = inputLayout.getChildAt(currentRow) as LinearLayout
+
+            val userInputWord = getUserInputWord(todayWord, nowRow)
+            val isInWordList = checkIfInWordList(userInputWord, wordsList)
+
+
+            if (isInWordList) {
+                val win = checkWordCorrectness(userInputWord, todayWord)
+                if (win) {
+                    val toast =
+                        Toast.makeText(this, "Congratulations", Toast.LENGTH_LONG)
+                    toast.show()
+                } else {
+                    val toast = Toast.makeText(this, "Not this time", Toast.LENGTH_LONG)
+                    toast.show()
+                }
+                currentRow += 1
+            } else {
+                val toast = Toast.makeText(this, "Not in word list", Toast.LENGTH_LONG)
+                toast.show()
+            }
+
+        }
+
+
+        val reRollBtn = findViewById<Button>(R.id.re_roll_btn)
+        reRollBtn.setOnClickListener {
+            val randomWordIdx = getRandomWordIndex(getRandomSeed(todayIdx), todayIdx)
+            Log.d("random word", wordsList[randomWordIdx])
+        }
+
     }
 }
