@@ -10,4 +10,7 @@
     <color name="dark_gray_bg">#4C4E52</color>
     <color name="green_input">#67CFAC</color>
     <color name="green_btn">#54A88C</color>
+    <color name="yellow">#ffff00</color>
+    <color name="gray">#808080</color>
+    <color name="green">#008000</color>
 </resources>
