@@ -30,6 +30,7 @@ class MainActivity : AppCompatActivity() {
     private fun getWordList(jsonFileName: String): List<String>? {
         val wordList: List<String>?
         try {
+//            throw IllegalArgumentException(jsonFileName)
             val inputStream: InputStream = assets.open(jsonFileName)
             val jsonWords = inputStream.bufferedReader().use { it.readText() }
             wordList = Gson().fromJson(jsonWords, WordleWordList::class.java).words
@@ -51,10 +52,8 @@ class MainActivity : AppCompatActivity() {
         var userWord = ""
 
         val inputRow = currentRow
-        //val childrenCount = inputRow.childCount
         for (i in 0 until inputRow.childCount) {
             val editText = inputRow.getChildAt(i) as EditText
-            val nextEditText = inputRow.getChildAt(i+1) as EditText
             val currentLetter = editText.text.toString().lowercase()
 
             if (currentLetter.isNotBlank()) {
@@ -86,16 +85,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * Function to check, if word provided by the user matches correct drawn word.
-     * @param userWord word provided by the user.
-     * @return boolean value if userWord matches correct word. True if so, else false
-     */
-    private fun checkWordCorrectness(userWord: String): Boolean {
-        val correctWord = GuessingWord.getWord()
-        return (userWord == correctWord)
-    }
-
-    /**
      *Function to check if word provided by the user is in the word list. If word is not in the word list user doesn't loose his attempt and can retype the word.
      * @param wordList word list with all words available in the game.
      * @return boolean value if userWord is in the word list. True if so, else false.
@@ -107,9 +96,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun gameLoop() {
 
-
+        var gameStatus = GuessingWord.getGuessed()
         val wordsJsonFileName = "words.json"
-        val wordsList = getWordList(wordsJsonFileName)!!
+        val wordsList  = getWordList(wordsJsonFileName)!!
         val inputLayout = findViewById<LinearLayout>(R.id.inputLayout)
 
         GuessingWord.setTodayWord(wordsList)
@@ -124,8 +113,8 @@ class MainActivity : AppCompatActivity() {
             val isInWordList = checkIfInWordList(wordsList)
 
             if (isInWordList) {
-                val win = checkWordCorrectness(userInputWord)
-                if (win) {
+                GuessingWord.checkCorrectness(userInputWord)
+                if (gameStatus) {
                     val toast =
                         Toast.makeText(this, "Congratulations", Toast.LENGTH_LONG)
                     toast.show()

@@ -6,9 +6,20 @@ import kotlin.random.Random
 
 object GuessingWord {
     private var word: String = String()
+    private var guessed: Boolean = false
 
     fun getWord(): String {
         return this.word
+    }
+
+    fun getGuessed(): Boolean {
+        return this.guessed
+    }
+
+    fun checkCorrectness(userWord: String) {
+        if (userWord == this.getWord()){
+            this.guessed = true
+        }
     }
 
     private fun setWord(newWord: String) {
