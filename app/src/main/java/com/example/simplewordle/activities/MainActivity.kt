@@ -1,6 +1,7 @@
 package com.example.simplewordle.activities
 
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
@@ -15,12 +16,13 @@ import java.io.InputStream
 
 
 class MainActivity : AppCompatActivity() {
+    var currentRow: Int = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         gameLoop()
     }
-
 
     /**
      * Function grabs assets json file with words.
@@ -96,54 +98,60 @@ class MainActivity : AppCompatActivity() {
 
     private fun gameLoop() {
 
-        var gameStatus = GuessingWord.getGuessed()
         val wordsJsonFileName = "words.json"
-        val wordsList  = getWordList(wordsJsonFileName)!!
+        val wordsList = getWordList(wordsJsonFileName)!!
         val inputLayout = findViewById<LinearLayout>(R.id.inputLayout)
 
         GuessingWord.setTodayWord(wordsList)
 
-        var currentRow = 0
-
         val checkBtn = findViewById<Button>(R.id.check_btn)
         checkBtn.setOnClickListener {
 
-            val nowRow = inputLayout.getChildAt(currentRow) as LinearLayout
+            val nowRow = inputLayout.getChildAt(this.currentRow) as LinearLayout
             val userInputWord = getUserInputWord(nowRow)
             val isInWordList = checkIfInWordList(wordsList)
 
             if (isInWordList) {
                 GuessingWord.checkCorrectness(userInputWord)
-                if (gameStatus) {
+                if (GuessingWord.getGuessed()) {
                     val toast =
                         Toast.makeText(this, "Congratulations", Toast.LENGTH_LONG)
                     toast.show()
                 } else {
-                    val toast = Toast.makeText(this, "Not this time", Toast.LENGTH_LONG)
-                    toast.show()
+                    Toast.makeText(this, "Not this time", Toast.LENGTH_LONG).show()
                 }
-                currentRow += 1
+                this.currentRow += 1
             } else {
-                val toast = Toast.makeText(this, "Not in word list", Toast.LENGTH_LONG)
-                toast.show()
+                Toast.makeText(this, "Not in word list", Toast.LENGTH_LONG).show()
             }
 
         }
 
-
         val reRollBtn = findViewById<Button>(R.id.re_roll_btn)
         reRollBtn.setOnClickListener {
+            clearInputs()
             GuessingWord.setRandomWord(wordsList)
         }
 
     }
 
-    private fun clearInputs(inputLayout: LinearLayout): Boolean {
-//        val rowsNumber = inputLayout.childCount
-//        for (i in 0 until rowsNumber) {
-//            val currentRow = inputLayout
-//        }
-
-        return true
+    private fun clearInputs() {
+        Log.d("clear", "Clearing inputs")
+        val layout = findViewById<LinearLayout>(R.id.inputLayout)
+        this.currentRow = 0
+        for (i in 0 until layout.childCount) {
+            val inputRow = layout.getChildAt(i) as LinearLayout
+            for (j in 0 until inputRow.childCount) {
+                val input = inputRow.getChildAt(j) as EditText
+                input.setText("")
+                input.background =
+                    ResourcesCompat.getDrawable(
+                        resources,
+                        R.drawable.rounded,
+                        null
+                    )
+                input.isEnabled = true
+            }
+        }
     }
 }
