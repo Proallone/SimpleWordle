@@ -1,7 +1,6 @@
 package com.example.simplewordle.activities
 
 import android.os.Bundle
-import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
@@ -9,55 +8,19 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
 import com.example.simplewordle.R
-import com.example.simplewordle.classes.WordleWord
+import com.example.simplewordle.classes.GuessingWord
+import com.example.simplewordle.classes.WordleWordList
 import com.google.gson.Gson
 import java.io.InputStream
-import java.util.*
-import kotlin.random.Random
 
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        gameLoop(false)
-
-
+        gameLoop()
     }
 
-    /**
-     * Calculates the seed used in random number generator based on calendar date.
-     * This ensures that every user has the same word of the day.
-     * @return seed which is a sum of the year, month and day from the device calendar
-     */
-    private fun getTodaySeed(): Int {
-        val c = Calendar.getInstance()
-        val year = c.get(Calendar.YEAR)
-        val month = c.get(Calendar.MONTH)
-        val day = c.get(Calendar.DAY_OF_MONTH)
-        return year + month + day
-    }
-
-    /**
-     * Generates random seed for getRandomWordIndex if user re-rolls his daily word.
-     * Seed values ranges from 0 to until param value.
-     * @param until maximum possible random number.
-     * @return random integer from 0 to until param value.
-     */
-    private fun getRandomSeed(until: Int): Int {
-        return Random.nextInt(from = 0, until)
-    }
-
-    /**
-     * Generates random index for word list using provided seed.
-     * @param seed seed used for random number generation. Ensures consisted random number with the same seed.
-     * @param until until maximum possible random number.
-     * @return random index used for getting word from word list.
-     */
-    private fun getRandomWordIndex(seed: Int, until: Int): Int {
-        return Random(seed).nextInt(from = 0, until)
-    }
 
     /**
      * Function grabs assets json file with words.
@@ -69,7 +32,7 @@ class MainActivity : AppCompatActivity() {
         try {
             val inputStream: InputStream = assets.open(jsonFileName)
             val jsonWords = inputStream.bufferedReader().use { it.readText() }
-            wordList = Gson().fromJson(jsonWords, WordleWord::class.java).words
+            wordList = Gson().fromJson(jsonWords, WordleWordList::class.java).words
 
         } catch (ex: Exception) {
             ex.printStackTrace()
@@ -82,7 +45,8 @@ class MainActivity : AppCompatActivity() {
      * Function gets user input word from given row.
      * @return word provided by the user
      */
-    private fun getUserInputWord(correctWord: String, currentRow: LinearLayout): String {
+    private fun getUserInputWord(currentRow: LinearLayout): String {
+        val correctWord = GuessingWord.getWord()
 
         var userWord = ""
 
@@ -90,6 +54,7 @@ class MainActivity : AppCompatActivity() {
         //val childrenCount = inputRow.childCount
         for (i in 0 until inputRow.childCount) {
             val editText = inputRow.getChildAt(i) as EditText
+            val nextEditText = inputRow.getChildAt(i+1) as EditText
             val currentLetter = editText.text.toString().lowercase()
 
             if (currentLetter.isNotBlank()) {
@@ -122,58 +87,44 @@ class MainActivity : AppCompatActivity() {
 
     /**
      * Function to check, if word provided by the user matches correct drawn word.
-     * @param userWord word provided by the user
-     * @param correctWord correctWord provided from word list
+     * @param userWord word provided by the user.
      * @return boolean value if userWord matches correct word. True if so, else false
      */
-    private fun checkWordCorrectness(userWord: String, correctWord: String): Boolean {
+    private fun checkWordCorrectness(userWord: String): Boolean {
+        val correctWord = GuessingWord.getWord()
         return (userWord == correctWord)
     }
 
     /**
      *Function to check if word provided by the user is in the word list. If word is not in the word list user doesn't loose his attempt and can retype the word.
-     * @param userWord word provided by the user
      * @param wordList word list with all words available in the game.
      * @return boolean value if userWord is in the word list. True if so, else false.
      */
-    private fun checkIfInWordList(userWord: String, wordList: List<String>): Boolean {
+    private fun checkIfInWordList(wordList: List<String>): Boolean {
+        val userWord = GuessingWord.getWord()
         return (userWord == wordList.find { word -> word == userWord })
     }
 
-    private fun gameLoop(gameStatus: Boolean) {
+    private fun gameLoop() {
 
-        //        var currentRow = 0
-//        var userWord: String? = null
-//        while (gameStatus) {
-////            userWord = getUserInputWord()
-//
-//
-//        }
 
         val wordsJsonFileName = "words.json"
-        val wordsList = getWordList(wordsJsonFileName)
+        val wordsList = getWordList(wordsJsonFileName)!!
         val inputLayout = findViewById<LinearLayout>(R.id.inputLayout)
 
-        val lastWordIdx = wordsList!!.size
-        val seedThisDay = getTodaySeed()
-        val todayIdx = getRandomWordIndex(seedThisDay, lastWordIdx)
-        val todayWord = wordsList[todayIdx]
-        Log.d("today word", todayWord)
+        GuessingWord.setTodayWord(wordsList)
 
         var currentRow = 0
-
 
         val checkBtn = findViewById<Button>(R.id.check_btn)
         checkBtn.setOnClickListener {
 
             val nowRow = inputLayout.getChildAt(currentRow) as LinearLayout
-
-            val userInputWord = getUserInputWord(todayWord, nowRow)
-            val isInWordList = checkIfInWordList(userInputWord, wordsList)
-
+            val userInputWord = getUserInputWord(nowRow)
+            val isInWordList = checkIfInWordList(wordsList)
 
             if (isInWordList) {
-                val win = checkWordCorrectness(userInputWord, todayWord)
+                val win = checkWordCorrectness(userInputWord)
                 if (win) {
                     val toast =
                         Toast.makeText(this, "Congratulations", Toast.LENGTH_LONG)
@@ -193,9 +144,17 @@ class MainActivity : AppCompatActivity() {
 
         val reRollBtn = findViewById<Button>(R.id.re_roll_btn)
         reRollBtn.setOnClickListener {
-            val randomWordIdx = getRandomWordIndex(getRandomSeed(todayIdx), todayIdx)
-            Log.d("random word", wordsList[randomWordIdx])
+            GuessingWord.setRandomWord(wordsList)
         }
 
+    }
+
+    private fun clearInputs(inputLayout: LinearLayout): Boolean {
+//        val rowsNumber = inputLayout.childCount
+//        for (i in 0 until rowsNumber) {
+//            val currentRow = inputLayout
+//        }
+
+        return true
     }
 }
