@@ -2,4 +2,7 @@
     <string name="app_name">SimpleWordle</string>
     <string name="check_btn">Check</string>
     <string name="re_roll_btn">Re-roll</string>
+    <string name="correct_word_toast">Congratulations!</string>
+    <string name="incorrect_word_toast">Not this time!</string>
+    <string name="word_not_in_list">Not in word list!</string>
 </resources>

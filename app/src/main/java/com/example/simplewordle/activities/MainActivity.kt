@@ -106,25 +106,7 @@ class MainActivity : AppCompatActivity() {
 
         val checkBtn = findViewById<Button>(R.id.check_btn)
         checkBtn.setOnClickListener {
-
-            val nowRow = inputLayout.getChildAt(this.currentRow) as LinearLayout
-            val userInputWord = getUserInputWord(nowRow)
-            val isInWordList = checkIfInWordList(wordsList)
-
-            if (isInWordList) {
-                GuessingWord.checkCorrectness(userInputWord)
-                if (GuessingWord.getGuessed()) {
-                    val toast =
-                        Toast.makeText(this, "Congratulations", Toast.LENGTH_LONG)
-                    toast.show()
-                } else {
-                    Toast.makeText(this, "Not this time", Toast.LENGTH_LONG).show()
-                }
-                this.currentRow += 1
-            } else {
-                Toast.makeText(this, "Not in word list", Toast.LENGTH_LONG).show()
-            }
-
+            checkUserInput(inputLayout, wordsList)
         }
 
         val reRollBtn = findViewById<Button>(R.id.re_roll_btn)
@@ -154,4 +136,25 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
+    private fun checkUserInput(inputLayout: LinearLayout, wordsList: List<String>) {
+        val currentRow = inputLayout.getChildAt(this.currentRow) as LinearLayout
+        val userInputWord = getUserInputWord(currentRow)
+        val isInWordList = checkIfInWordList(wordsList)
+
+        if (isInWordList) {
+            GuessingWord.checkCorrectness(userInputWord)
+            if (GuessingWord.getGuessed()) {
+                val toast =
+                    Toast.makeText(this, this.getString(R.string.correct_word_toast), Toast.LENGTH_LONG)
+                toast.show()
+            } else {
+                Toast.makeText(this, this.getString(R.string.incorrect_word_toast), Toast.LENGTH_LONG).show()
+            }
+            this.currentRow += 1
+        } else {
+            Toast.makeText(this, this.getString(R.string.word_not_in_list), Toast.LENGTH_LONG).show()
+        }
+    }
+
 }
