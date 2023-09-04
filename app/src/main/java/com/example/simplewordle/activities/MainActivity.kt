@@ -16,13 +16,32 @@ import java.io.InputStream
 
 
 class MainActivity : AppCompatActivity() {
-    var currentRow: Int = 0
+    private var currentRow: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         gameLoop()
     }
+
+    private fun changeCurrentRow(inputLayout: LinearLayout) {
+        Log.d("changeRow", "Change current row from ${currentRow} to ${currentRow+1}")
+        //Enable current row
+        val currentRow = inputLayout.getChildAt(this.currentRow) as LinearLayout
+        for (i in 0 until currentRow.childCount) {
+            val input = currentRow.getChildAt(i) as EditText
+            input.isEnabled = true
+        }
+        //Disable previous row
+        if (this.currentRow !== 0) {
+            val previousRow = inputLayout.getChildAt(this.currentRow - 1) as LinearLayout
+            for (i in 0 until currentRow.childCount) {
+                val input = previousRow.getChildAt(i) as EditText
+                input.isEnabled = false
+            }
+        }
+    }
+
 
     /**
      * Function grabs assets json file with words.
@@ -74,13 +93,16 @@ class MainActivity : AppCompatActivity() {
                             R.drawable.letter_correct_wrongplace,
                             null
                         )
-
                 } else {
                     editText.background =
                         ResourcesCompat.getDrawable(resources, R.drawable.letter_wrong, null)
                 }
                 editText.isEnabled = false
                 userWord += currentLetter
+            } else {
+                val toast =
+                    Toast.makeText(this, "DSADSDASD", Toast.LENGTH_LONG)
+                toast.show()
             }
         }
         return userWord
@@ -107,6 +129,7 @@ class MainActivity : AppCompatActivity() {
         val checkBtn = findViewById<Button>(R.id.check_btn)
         checkBtn.setOnClickListener {
             checkUserInput(inputLayout, wordsList)
+            changeCurrentRow(inputLayout)
         }
 
         val reRollBtn = findViewById<Button>(R.id.re_roll_btn)
@@ -146,14 +169,23 @@ class MainActivity : AppCompatActivity() {
             GuessingWord.checkCorrectness(userInputWord)
             if (GuessingWord.getGuessed()) {
                 val toast =
-                    Toast.makeText(this, this.getString(R.string.correct_word_toast), Toast.LENGTH_LONG)
+                    Toast.makeText(
+                        this,
+                        this.getString(R.string.correct_word_toast),
+                        Toast.LENGTH_LONG
+                    )
                 toast.show()
             } else {
-                Toast.makeText(this, this.getString(R.string.incorrect_word_toast), Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    this,
+                    this.getString(R.string.incorrect_word_toast),
+                    Toast.LENGTH_LONG
+                ).show()
             }
             this.currentRow += 1
         } else {
-            Toast.makeText(this, this.getString(R.string.word_not_in_list), Toast.LENGTH_LONG).show()
+            Toast.makeText(this, this.getString(R.string.word_not_in_list), Toast.LENGTH_LONG)
+                .show()
         }
     }
 
