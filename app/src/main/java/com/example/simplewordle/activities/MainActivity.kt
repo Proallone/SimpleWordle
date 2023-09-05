@@ -25,7 +25,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun changeCurrentRow(inputLayout: LinearLayout) {
-        Log.d("changeRow", "Change current row from ${currentRow} to ${currentRow+1}")
+        Log.d("changeRow", "Change current row from ${currentRow} to ${currentRow + 1}")
         //Enable current row
         val currentRow = inputLayout.getChildAt(this.currentRow) as LinearLayout
         for (i in 0 until currentRow.childCount) {
@@ -101,7 +101,7 @@ class MainActivity : AppCompatActivity() {
                 userWord += currentLetter
             } else {
                 val toast =
-                    Toast.makeText(this, "DSADSDASD", Toast.LENGTH_LONG)
+                    Toast.makeText(this, "Please fill in all blanks!", Toast.LENGTH_LONG)
                 toast.show()
             }
         }
@@ -113,8 +113,7 @@ class MainActivity : AppCompatActivity() {
      * @param wordList word list with all words available in the game.
      * @return boolean value if userWord is in the word list. True if so, else false.
      */
-    private fun checkIfInWordList(wordList: List<String>): Boolean {
-        val userWord = GuessingWord.getWord()
+    private fun checkIfInWordList(wordList: List<String>, userWord: String): Boolean {
         return (userWord == wordList.find { word -> word == userWord })
     }
 
@@ -128,7 +127,7 @@ class MainActivity : AppCompatActivity() {
 
         val checkBtn = findViewById<Button>(R.id.check_btn)
         checkBtn.setOnClickListener {
-            checkUserInput(inputLayout, wordsList)
+            checkUserInputs(inputLayout, wordsList)
             changeCurrentRow(inputLayout)
         }
 
@@ -137,6 +136,7 @@ class MainActivity : AppCompatActivity() {
             clearInputs()
             GuessingWord.setRandomWord(wordsList)
         }
+
 
     }
 
@@ -160,10 +160,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun checkUserInput(inputLayout: LinearLayout, wordsList: List<String>) {
+    private fun checkUserInputs(inputLayout: LinearLayout, wordsList: List<String>) {
         val currentRow = inputLayout.getChildAt(this.currentRow) as LinearLayout
         val userInputWord = getUserInputWord(currentRow)
-        val isInWordList = checkIfInWordList(wordsList)
+        val isInWordList = checkIfInWordList(wordsList, userInputWord)
 
         if (isInWordList) {
             GuessingWord.checkCorrectness(userInputWord)
